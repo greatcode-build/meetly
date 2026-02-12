@@ -28,7 +28,7 @@ const Sidebar = () => {
                 alt={link.label}
                 width={24}
                 height={24}
-                className="w-6 h-auto"
+                className="w-auto h-auto"
               />
               <p className="text-lg font-semibold max-lg:hidden">
                 {link.label}

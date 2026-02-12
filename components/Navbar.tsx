@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MobileNav } from "./MobileNav";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   return (
@@ -11,14 +12,16 @@ const Navbar = () => {
           width={42}
           height={42}
           alt="meetly logo"
-          className="max-sm:size-10"
+          className="max-sm:size-10 w-10 h-auto"
         />
         <p className="text-[26px] font-extrabold text-white max-sm:hidden">
           Meetly
         </p>
       </Link>
       <div className="flex justify-between items-center gap-5">
-        {/* Clerk user management */}
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
         <MobileNav />
       </div>
     </nav>
