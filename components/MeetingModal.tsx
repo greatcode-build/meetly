@@ -2,9 +2,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -35,18 +33,25 @@ const MeetingModal = ({
 }: MeetingModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger className="hidden">Open</DialogTrigger>
       <DialogContent className="flex flex-col w-full max-w-130 border-none bg-[#161925] px-6 py-9 text-white">
-        <DialogHeader>
-          <DialogTitle
-            className={cn("text-3xl font-bold leading-10.5", className)}
-          >
-            {title}
-          </DialogTitle>
-          <DialogDescription asChild>
-            <div>{children}</div>
-          </DialogDescription>
-        </DialogHeader>
+        <div className="flex flex-col gap-6">
+          {image && (
+            <div className="flex justify-center">
+              <Image src={image} alt="image" width={72} height={72} />
+            </div>
+          )}
+        </div>
+        <DialogTitle
+          className={cn(
+            "text-3xl font-bold text-center leading-10.5",
+            className,
+          )}
+        >
+          {title}
+        </DialogTitle>
+        <DialogDescription asChild>
+          <div>{children}</div>
+        </DialogDescription>
         <Button
           className="bg-[#0E78F9] focus-visible:ring-0 focus-visible:ring-offset-0"
           onClick={handleClick}
@@ -56,13 +61,6 @@ const MeetingModal = ({
           )}{" "}
           {buttonText || "Schedule Meeting"}
         </Button>
-        <div className="flex flex-col gap-6">
-          {image && (
-            <div className="flex justify-center">
-              <Image src={image} alt="image" width={72} height={72} />
-            </div>
-          )}
-        </div>
       </DialogContent>
     </Dialog>
   );

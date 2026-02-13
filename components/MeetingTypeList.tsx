@@ -4,9 +4,11 @@ import { useState } from "react";
 import { HomeCard } from "./HomeCard";
 import { useRouter } from "next/navigation";
 import { MeetingModal } from "./MeetingModal";
-import { useStreamVideoClient } from "@stream-io/video-react-sdk";
+import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const initialValues = {
   dateTime: new Date(),
@@ -19,7 +21,7 @@ const MeetingTypeList = () => {
   const [meeting, setMeeting] = useState<
     "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
   >();
-  const [callDetails, setCallDetails] = useState();
+  const [callDetails, setCallDetails] = useState<Call>();
   const [values, setValues] = useState(initialValues);
   const client = useStreamVideoClient();
 
@@ -28,16 +30,21 @@ const MeetingTypeList = () => {
 
     const id = crypto.randomUUID();
     const call = client.call("default", id);
-    router.push(`/meeting/${id}`);
+    if (!call) throw new Error("Failed to create meeting");
+    if (!values.description) {
+      router.push(`/meeting/${id}`);
+    }
 
     try {
       await call.getOrCreate();
       toast.success("Meeting created successfully");
+      setCallDetails(call);
     } catch (error) {
       toast("Failed to create meeting");
       console.error("Failed to create meeting", error);
     }
   };
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
 
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -93,6 +100,14 @@ const MeetingTypeList = () => {
             <label className="text-base text-normal leading-5.5 text-[#ECF0FF]">
               Select date and Time
             </label>
+            <DatePicker
+              selected={values.dateTime}
+              onChange={(date: Date | null) =>
+                setValues({ ...values, dateTime: date! })
+              }
+              showTimeSelect
+              dateFormat="Pp"
+            />
           </div>
         </MeetingModal>
       ) : (
@@ -101,12 +116,12 @@ const MeetingTypeList = () => {
           onClose={() => setMeeting(undefined)}
           title="Meeting Created "
           handleClick={() => {
-            // navigator.clipboard.writeText(meetingLink);
+            navigator.clipboard.writeText(meetingLink);
             toast("Link copied");
           }}
           image="/icons/checked.svg"
-          buttonIcon="/icons/copy.svg"
           buttonText="Copy Meeting Link"
+          buttonIcon="/icons/copy.svg"
         />
       )}
 
