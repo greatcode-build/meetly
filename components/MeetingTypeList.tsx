@@ -6,12 +6,21 @@ import { useRouter } from "next/navigation";
 import { MeetingModal } from "./MeetingModal";
 import { useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+
+const initialValues = {
+  dateTime: new Date(),
+  description: "",
+  link: "",
+};
 
 const MeetingTypeList = () => {
   const router = useRouter();
   const [meeting, setMeeting] = useState<
     "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
   >();
+  const [callDetails, setCallDetails] = useState();
+  const [values, setValues] = useState(initialValues);
   const client = useStreamVideoClient();
 
   const createMeeting = async () => {
@@ -60,6 +69,47 @@ const MeetingTypeList = () => {
         handleClick={() => setMeeting("isJoiningMeeting")}
         className="bg-[#F9A90E]"
       />
+
+      {!callDetails ? (
+        <MeetingModal
+          isOpen={meeting === "isScheduleMeeting"}
+          onClose={() => setMeeting(undefined)}
+          title="Create Meeting"
+          handleClick={createMeeting}
+          buttonText=""
+        >
+          <div className="flex flex-col gap-2.5">
+            <label className="text-base text-normal leading-5.5 text-[#ECF0FF]">
+              Add a description
+            </label>
+            <Textarea
+              className="border-none bg-[#1C1F2E] focus-visible:ring-0 focus-visible:ring-offset-0"
+              onChange={(e) => {
+                setValues({ ...values, description: e.target.value });
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <label className="text-base text-normal leading-5.5 text-[#ECF0FF]">
+              Select date and Time
+            </label>
+          </div>
+        </MeetingModal>
+      ) : (
+        <MeetingModal
+          isOpen={meeting === "isScheduleMeeting"}
+          onClose={() => setMeeting(undefined)}
+          title="Meeting Created "
+          handleClick={() => {
+            // navigator.clipboard.writeText(meetingLink);
+            toast("Link copied");
+          }}
+          image="/icons/checked.svg"
+          buttonIcon="/icons/copy.svg"
+          buttonText="Copy Meeting Link"
+        />
+      )}
+
       <MeetingModal
         isOpen={meeting === "isInstantMeeting"}
         onClose={() => setMeeting(undefined)}

@@ -43,7 +43,9 @@ const MeetingModal = ({
           >
             {title}
           </DialogTitle>
-          <DialogDescription>{children}</DialogDescription>
+          <DialogDescription asChild>
+            <div>{children}</div>
+          </DialogDescription>
         </DialogHeader>
         <Button
           className="bg-[#0E78F9] focus-visible:ring-0 focus-visible:ring-offset-0"

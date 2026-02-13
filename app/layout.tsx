@@ -42,6 +42,7 @@ export default function RootLayout({
             colorInputText: "#ffff",
           },
         }}
+        publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       >
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#161925]`}
