@@ -28,15 +28,28 @@ const MeetingTypeList = () => {
   const createMeeting = async () => {
     if (!client) return;
 
-    const id = crypto.randomUUID();
-    const call = client.call("default", id);
-    if (!call) throw new Error("Failed to create meeting");
-    if (!values.description) {
-      router.push(`/meeting/${id}`);
-    }
-
     try {
-      await call.getOrCreate();
+      if (!values.dateTime) {
+        toast("Please select a date and time");
+        return;
+      }
+      const id = crypto.randomUUID();
+      const call = client.call("default", id);
+      if (!call) throw new Error("Failed to create meeting");
+      const startsAt =
+        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const description = values.description || "Instant Meeting";
+      await call.getOrCreate({
+        data: {
+          starts_at: startsAt,
+          custom: {
+            description,
+          },
+        },
+      });
+      if (!values.description) {
+        router.push(`/meeting/${id}`);
+      }
       toast.success("Meeting created successfully");
       setCallDetails(call);
     } catch (error) {

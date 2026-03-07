@@ -15,59 +15,107 @@ const MeetingSetup = ({
   setIsSetupComplete: (value: boolean) => void;
 }) => {
   const call = useCall();
-  const [isMicCamToggled, setIsMicCamToggled] = useState(false);
   const { useCameraState } = useCallStateHooks();
-  const { hasBrowserPermission, camera } = useCameraState();
+  const { hasBrowserPermission } = useCameraState();
 
-  if (!hasBrowserPermission) {
-    alert("User has not granted camera permissions!");
-  }
+  const [isMicCamToggled, setIsMicCamToggled] = useState(false);
+  const [hasCamera, setHasCamera] = useState(true);
+  const [isPreviewing, setIsPreviewing] = useState(false);
 
   useEffect(() => {
-    const previewCamera = async () => {
-      if (!hasBrowserPermission || !camera) return;
+    const checkDevices = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((d) => d.kind === "videoinput");
+        setHasCamera(videoDevices.length > 0);
+        if (videoDevices.length === 0) console.warn("No camera detected");
+      } catch (err) {
+        console.error("Device enumeration failed:", err);
+        setHasCamera(false);
+      }
+    };
+    checkDevices();
+  }, []);
+
+  useEffect(() => {
+    const startPreview = async () => {
+      if (!call) return;
+      if (!hasBrowserPermission) {
+        console.warn("Camera permission not granted");
+        return;
+      }
 
       try {
-        await camera.enable();
+        if (hasCamera && !isMicCamToggled) {
+          await call.camera.enable();
+        } else {
+          await call.camera.disable();
+        }
+
+        if (!isMicCamToggled) {
+          await call.microphone.enable();
+        } else {
+          await call.microphone.disable();
+        }
+
+        setIsPreviewing(true);
       } catch (err) {
-        console.error("Camera preview failed:", err);
+        console.error("Preview failed:", err);
+        setIsPreviewing(false);
       }
     };
 
-    previewCamera();
-  }, [hasBrowserPermission, camera]);
+    startPreview();
+  }, [call, hasBrowserPermission, hasCamera, isMicCamToggled]);
 
   const joinMeeting = async () => {
+    if (!call) return;
+
     try {
-      await call?.camera.select(undefined);
-      if (isMicCamToggled) {
-        await call?.camera.disable();
-        await call?.microphone.disable();
+      if (hasCamera && !isMicCamToggled) {
+        await call.camera.select(undefined);
+      } else {
+        await call.camera.disable();
       }
 
-      await call?.join();
+      if (isMicCamToggled) {
+        await call.microphone.disable();
+      }
+
+      await call.join();
       setIsSetupComplete(true);
-    } catch (error) {
-      console.error("Join failed:", error);
+    } catch (err) {
+      console.error("Join failed:", err);
     }
   };
 
   return (
     <div className="flex flex-col justify-center items-center h-screen w-full gap-3 text-white">
       <h1 className="text-2xl font-bold">Setup</h1>
-      <VideoPreview />
+
+      {hasCamera && isPreviewing ? (
+        <VideoPreview />
+      ) : (
+        <p className="text-red-400">No camera available or preview failed</p>
+      )}
+
       <div className="flex items-center justify-center h-16 gap-3">
         <label className="flex items-center justify-center gap-2 font-medium">
           <input
             type="checkbox"
             checked={isMicCamToggled}
             onChange={(e) => setIsMicCamToggled(e.target.checked)}
-          />{" "}
+          />
           Join with mic and camera off
         </label>
         <DeviceSettings />
       </div>
-      <Button className="rounded-md bg-green-500" onClick={joinMeeting}>
+
+      <Button
+        className="rounded-md bg-green-500"
+        onClick={joinMeeting}
+        disabled={!hasCamera && !isMicCamToggled}
+      >
         Join Meeting
       </Button>
     </div>
