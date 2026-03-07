@@ -33,7 +33,7 @@ const CallList = ({ type }: { type: "upcoming" | "ended" | "recordings" }) => {
           callRecordings.map((recording) => (
             <MeetingCard
               key={recording.url}
-              icon="/icons/recording.svg"
+              icon="/icons/recordings.svg"
               title="Recording"
               date="Recorded meeting"
               isPreviousMeeting={false}
