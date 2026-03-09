@@ -34,8 +34,8 @@ const CallList = ({ type }: { type: "upcoming" | "ended" | "recordings" }) => {
             <MeetingCard
               key={recording.url}
               icon="/icons/recordings.svg"
-              title="Recording"
-              date="Recorded meeting"
+              title={recording.filename?.substring(0, 20) || "No Description"}
+              date={recording.start_time.toLocaleString()}
               isPreviousMeeting={false}
               buttonIcon1="/icons/play.svg"
               buttonText="Play"
