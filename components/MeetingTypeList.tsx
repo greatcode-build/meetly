@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Input } from "./ui/input";
 
 const initialValues = {
   dateTime: new Date(),
@@ -146,6 +147,20 @@ const MeetingTypeList = () => {
         handleClick={createMeeting}
         className="text-center"
       />
+      <MeetingModal
+        isOpen={meeting === "isJoiningMeeting"}
+        onClose={() => setMeeting(undefined)}
+        title="Type the link here"
+        buttonText="Join Meeting"
+        handleClick={() => router.push(values.link)}
+        className="text-center"
+      >
+        <Input
+          className="border-none bg-[#252A41] focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Meeting link"
+          onChange={(e) => setValues({ ...values, link: e.target.value })}
+        />
+      </MeetingModal>
     </section>
   );
 };
