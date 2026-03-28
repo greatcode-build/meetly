@@ -109,7 +109,7 @@ A modern, real-time video conferencing platform built with Next.js and Stream Vi
 
 ```
 meetly/
-├── app/                    # Next.js app directory
+├── app/                   # Next.js app directory
 │   ├── (auth)/            # Authentication pages
 │   ├── (root)/            # Main application pages
 │   └── api/               # API routes
@@ -117,7 +117,7 @@ meetly/
 ├── constants/             # App constants and configuration
 ├── hooks/                 # Custom React hooks
 ├── lib/                   # Utility functions
-├── providers/            # Context providers
+├── providers/             # Context providers
 ├── store/                 # Zustand state management
-└── public/               # Static assets
+└── public/                # Static assets
 ```
